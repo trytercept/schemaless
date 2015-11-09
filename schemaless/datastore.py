@@ -2,7 +2,7 @@ import time
 import simplejson
 import zlib
 
-import tornado.database
+import torndb
 
 from schemaless.column import Entity
 from schemaless.index import Index
@@ -20,7 +20,7 @@ class DataStore(object):
             raise NotImplementedError
         self.use_zlib = use_zlib
         self.indexes = [Index('entities', ['tag'])]
-        self.connection = tornado.database.Connection(host=mysql_shards[0], user=user, password=password, database=database)
+        self.connection = torndb.Connection(host=mysql_shards[0], user=user, password=password, database=database)
         if create_entities and not self.check_table_exists('entities'):
             self.create_entities_table()
 
@@ -82,7 +82,7 @@ class DataStore(object):
         q += ')'
         try:
             self.connection.execute(q, *vals)
-        except tornado.database.OperationalError:
+        except torndb.OperationalError:
             self.log.exception('query = %s, vals = %s' % (q, vals))
             raise
 
