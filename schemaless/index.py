@@ -19,7 +19,7 @@ def reduce_args(*exprs, **kwargs):
         order_by = Order(order_by, asc=asc, desc=desc)
 
     exprs = list(exprs)
-    for k, v in kwargs.iteritems():
+    for k, v in kwargs.items():
         exprs.append(ColumnExpression(k, ColumnExpression.OP_EQ, v))
 
     # if it's just an order_by, check for the order_by column not nulll
@@ -54,7 +54,7 @@ class Index(object):
     def matches(self, entity, keys):
         if not (self.properties <= keys):
             return False
-        for k, v in self.match_on.iteritems():
+        for k, v in self.match_on.items():
             if entity.get(k) != v:
                 return False
         return True

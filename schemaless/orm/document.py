@@ -9,7 +9,7 @@ from schemaless.orm.column import Column, DEFAULT_NONCE
 from schemaless import c
 
 def _collect_fields(x):
-    return set((k, v) for k, v in x.__dict__.iteritems() if k != 'tag' and not k.startswith('_') and not callable(v))
+    return set((k, v) for k, v in x.__dict__.items() if k != 'tag' and not k.startswith('_') and not callable(v))
 
 def make_base(session, meta_base=type, base_cls=object, tags_file=None, tags_db=None):
     """Create a base class for ORM documents.
@@ -103,7 +103,7 @@ def make_base(session, meta_base=type, base_cls=object, tags_file=None, tags_db=
             self.__dict__['_schemaless_collected_fields'] = set(['tag'])
             self.__dict__['_schemaless_id'] = from_dict.get('id', None)
 
-            for k, v in from_dict.iteritems():
+            for k, v in from_dict.items():
                 if k in self._column_names:
                     self.__dict__[k] = v
                     self._schemaless_collected_fields.add(k)
@@ -152,7 +152,7 @@ def make_base(session, meta_base=type, base_cls=object, tags_file=None, tags_db=
             missing = cls._required_columns - set(d.keys())
             if missing:
                 raise ValueError('Missing from %s the following keys: %s' % (d, ', '.join(k for k in sorted(missing))))
-            for k, v in d.iteritems():
+            for k, v in d.items():
                 c = cls._column_map.get(k)
                 if c and c.convert:
                     d[k] = c.convert.from_db(v)

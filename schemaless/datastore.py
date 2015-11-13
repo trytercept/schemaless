@@ -1,5 +1,6 @@
 import time
 import simplejson
+import sys
 import zlib
 
 import torndb
@@ -8,6 +9,8 @@ from schemaless.column import Entity
 from schemaless.index import Index
 from schemaless.guid import raw_guid
 from schemaless.log import ClassLogger
+
+from schemaless._compat import to_bytes
 
 class DataStore(object):
 
@@ -62,7 +65,10 @@ class DataStore(object):
                 entity_id = entity_id.decode('hex')
         body = simplejson.dumps(entity_copy)
         if self.use_zlib:
-            body = zlib.compress(body, 1)
+            if sys.version_info[0] == 2:
+                body = zlib.compress(body, 1)
+            else:
+                body = zlib.compress(to_bytes(body), 1)
 
         if is_update:
             self._put_update(entity_id, entity_copy, body)
