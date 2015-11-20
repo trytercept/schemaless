@@ -1,3 +1,4 @@
+import codecs
 import simplejson
 import sys
 import zlib
@@ -17,7 +18,7 @@ class Entity(dict):
         if sys.version_info[0] == 2:
             d['id'] = row['id'].encode('hex')
         else:
-            d['id'] = row['id']
+            d['id'] = codecs.encode(row['id'],'hex_codec')
         d['updated'] = row['updated']
         return cls(d)
 

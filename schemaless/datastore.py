@@ -1,3 +1,5 @@
+import codecs
+import pymysql
 import time
 import simplejson
 import sys
@@ -9,8 +11,7 @@ from schemaless.column import Entity
 from schemaless.index import Index
 from schemaless.guid import raw_guid
 from schemaless.log import ClassLogger
-
-from schemaless._compat import to_bytes
+from schemaless._compat import to_bytes, to_string
 
 class DataStore(object):
 
@@ -62,7 +63,10 @@ class DataStore(object):
         else:
             is_update = True
             if len(entity_id) != 16:
-                entity_id = entity_id.decode('hex')
+                if sys.version_info[0] == 2:
+                    entity_id = entity_id.decode('hex')
+                else:
+                    entity_id = codecs.decode(entity_id, "hex_codec")
         body = simplejson.dumps(entity_copy)
         if self.use_zlib:
             if sys.version_info[0] == 2:
@@ -88,7 +92,7 @@ class DataStore(object):
         q += ')'
         try:
             self.connection.execute(q, *vals)
-        except torndb.OperationalError:
+        except pymysql.OperationalError:
             self.log.exception('query = %s, vals = %s' % (q, vals))
             raise
 
@@ -128,7 +132,10 @@ class DataStore(object):
             entity = self.by_id(id)
             if not entity:
                 return 0
-        entity_id = entity['id'].decode('hex')
+        if sys.version_info[0] == 2:
+            entity_id = entity['id'].decode('hex')
+        else:
+            entity_id = codecs.decode(entity['id'], "hex_codec")
 
         def _delete(table_name):
             col = 'id' if table_name == 'entities' else 'entity_id'
@@ -146,7 +153,10 @@ class DataStore(object):
 
     def by_id(self, id):
         if len(id) == 32:
-            id = id.decode('hex')
+            if sys.version_info[0] == 2:
+                id = id.decode('hex')
+            else:
+                id = codecs.decode(id, "hex_codec")
         row = self.connection.get('SELECT * FROM entities WHERE id = %s', id)
         return Entity.from_row(row, use_zlib=self.use_zlib) if row else None
 
