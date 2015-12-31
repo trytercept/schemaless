@@ -15,11 +15,13 @@ class Entity(dict):
         if use_zlib:
             body = zlib.decompress(body)
         d = simplejson.loads(body)
-        if sys.version_info[0] == 2:
-            d['id'] = row['id'].encode('hex')
-        else:
-            d['id'] = codecs.encode(row['id'],'hex_codec')
-        d['updated'] = row['updated']
+        if 'id' in row:
+            if sys.version_info[0] == 2:
+                d['id'] = row['id'].encode('hex')
+            else:
+                d['id'] = codecs.encode(row['id'],'hex_codec')
+        if 'updated' in row:
+            d['updated'] = row['updated']
         return cls(d)
 
     def __hasattr__(self, name):
